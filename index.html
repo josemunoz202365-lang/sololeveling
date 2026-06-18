@@ -3,447 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE CAZADORES - SOLO LEVELING</title>
+    <title>SISTEMA DEL MONARCA DE LAS SOMBRAS - RPG</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00f3ff">
     <style>
         :root {
-            --bg-color: #03070d;
-            --panel-bg: rgba(6, 15, 30, 0.9);
+            --bg-color: #02050a;
+            --panel-bg: rgba(6, 14, 26, 0.95);
             --system-cyan: #00f3ff;
-            --system-blue: #0055ff;
+            --system-blue: #0066ff;
+            --system-purple: #9d4edd;
             --system-gold: #ffb703;
-            --system-text: #d0f4f7;
-            --penalty-red: #ff2a2a;
-            --border-glow: 0 0 15px rgba(0, 243, 255, 0.3);
+            --system-red: #ff1f1f;
+            --system-text: #cef1f5;
+            --slot-bg: rgba(2, 8, 18, 0.8);
+            --glow: 0 0 15px rgba(0, 243, 255, 0.4);
+            --glow-red: 0 0 15px rgba(255, 31, 31, 0.4);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
-            font-family: 'Courier New', Courier, monospace, sans-serif;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; -webkit-tap-highlight-color: transparent; }
         body {
-            background-color: var(--bg-color);
-            color: var(--system-text);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            background-image: radial-gradient(circle at center, #0b1a30 0%, #03070d 100%);
-            overflow-x: hidden;
+            background-color: var(--bg-color); color: var(--system-text);
+            min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
+            padding: 10px;
+            background-image: radial-gradient(circle at center, #0a182c 0%, #02050a 100%), linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px, 20px 20px;
         }
 
-        /* --- POPUP DE ADVERTENCIA INICIAL --- */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 7, 13, 0.95);
-            z-index: 999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .alert-box {
-            background: rgba(15, 32, 67, 0.85);
-            border: 3px solid var(--system-cyan);
-            box-shadow: 0 0 30px var(--system-cyan);
-            max-width: 500px;
-            width: 100%;
-            padding: 30px;
-            text-align: center;
-            border-radius: 4px;
-            animation: glitch-anim 2s infinite;
-        }
-        .alert-title {
-            color: var(--system-cyan);
-            font-size: 1.6rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px var(--system-cyan);
-        }
-        .btn-accept {
-            background: transparent;
-            border: 2px solid var(--system-cyan);
-            color: var(--system-cyan);
-            padding: 10px 30px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 25px;
-            transition: all 0.3s;
-            text-shadow: 0 0 5px var(--system-cyan);
-        }
-        .btn-accept:hover {
-            background: var(--system-cyan);
-            color: #000;
-            box-shadow: 0 0 15px var(--system-cyan);
-        }
+        /* --- PANTALLA DE INICIO (FIX MÓVIL) --- */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #02050a; z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .alert-box { background: var(--panel-bg); border: 2px solid var(--system-cyan); box-shadow: var(--glow); max-width: 480px; width: 100%; padding: 25px; text-align: center; border-radius: 4px; }
+        .alert-title { color: var(--system-cyan); font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; text-shadow: 0 0 10px var(--system-cyan); }
+        .btn-accept { background: transparent; border: 2px solid var(--system-cyan); color: var(--system-cyan); padding: 12px 35px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 20px; transition: all 0.2s; width: 100%; }
+        .btn-accept:hover { background: var(--system-cyan); color: #000; box-shadow: 0 0 20px var(--system-cyan); }
 
-        /* --- CONTENEDOR PRINCIPAL --- */
-        .system-window {
-            width: 100%;
-            max-width: 650px;
-            background: var(--panel-bg);
-            border: 2px solid var(--system-cyan);
-            border-radius: 4px;
-            box-shadow: var(--border-glow), inset 0 0 20px rgba(0, 243, 255, 0.15);
-            padding: 20px;
-            position: relative;
-        }
-
+        /* --- ESTRUCTURA PRINCIPAL --- */
+        .system-window { width: 100%; max-width: 700px; background: var(--panel-bg); border: 2px solid var(--system-cyan); border-radius: 4px; box-shadow: var(--glow), inset 0 0 25px rgba(0, 243, 255, 0.1); padding: 15px; margin-bottom: 20px;}
+        
         /* Cabecera */
-        .system-header {
-            border-bottom: 2px dashed var(--system-cyan);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        .system-title {
-            font-size: 1.4rem;
-            text-align: center;
-            color: var(--system-cyan);
-            text-shadow: 0 0 8px var(--system-cyan);
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-        .player-meta {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-            font-size: 1rem;
-        }
+        .system-header { border-bottom: 2px dashed var(--system-cyan); padding-bottom: 12px; margin-bottom: 15px; }
+        .system-title { font-size: 1.3rem; text-align: center; color: var(--system-cyan); font-weight: bold; margin-bottom: 10px; }
+        .player-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.9rem; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; }
+        
+        /* Barras de Estado */
+        .bar-group { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; }
+        .bar-label { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .status-bar-container { background: #060e1a; border: 1px solid rgba(0, 243, 255, 0.2); height: 12px; border-radius: 3px; overflow: hidden; }
+        .status-bar { height: 100%; width: 0%; transition: width 0.3s ease; }
+        .bg-hp { background: linear-gradient(90deg, #ff1f1f, #ff5e5e); box-shadow: 0 0 5px #ff1f1f; }
+        .bg-mp { background: linear-gradient(90deg, #0055ff, #00a2ff); box-shadow: 0 0 5px #0055ff; }
+        .bg-fatigue { background: linear-gradient(90deg, #b5179e, #7209b7); box-shadow: 0 0 5px #b5179e; }
+        .bg-exp { background: linear-gradient(90deg, #00f3ff, #0066ff); box-shadow: 0 0 5px var(--system-cyan); }
 
-        /* Menú de Pestañas */
-        .system-tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-        .tab-btn {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            color: #88c8cc;
-            padding: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-        .tab-btn.active {
-            background: rgba(0, 85, 255, 0.2);
-            border-color: var(--system-cyan);
-            color: var(--system-cyan);
-            box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
-        }
-
-        /* Contenido de Pestañas */
+        /* Pestañas */
+        .system-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; }
+        .tab-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 243, 255, 0.3); color: #7ccad0; padding: 8px 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+        .tab-btn.active { background: rgba(0, 102, 255, 0.2); border-color: var(--system-cyan); color: var(--system-cyan); box-shadow: 0 0 8px rgba(0, 243, 255, 0.3); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Barras de Estado (Fatiga, Oro) */
-        .status-bar-container {
-            background: #091324;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            height: 14px;
-            border-radius: 7px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-        .status-bar {
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        .bg-fatigue { background: linear-gradient(90deg, #9400d3, #ff00ff); box-shadow: 0 0 5px #ff00ff; }
-        .bg-quest { background: linear-gradient(90deg, var(--system-blue), var(--system-cyan)); box-shadow: 0 0 5px var(--system-cyan); }
+        /* Contenidos Genéricos */
+        .quest-box { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(0, 243, 255, 0.15); padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .quest-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,243,255,0.1); }
+        .btn-action { background: transparent; border: 1px solid var(--system-cyan); color: var(--system-cyan); padding: 6px 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.2s; }
+        .btn-action:hover { background: rgba(0,243,255,0.1); }
+        
+        .stat-card { background: rgba(0,0,0,0.4); border-left: 3px solid var(--system-blue); padding: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+        .btn-plus { background: var(--system-cyan); border: none; color: #000; width: 22px; height: 22px; border-radius: 50%; font-weight: bold; cursor: pointer; }
 
-        /* Lista de Objetivos */
-        .quest-item {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 243, 255, 0.15);
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        /* --- MOTOR DE COMBATE RPG POR TEXTO --- */
+        #combat-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); z-index: 8000; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px;
         }
-        .btn-action {
-            background: transparent;
-            border: 1px solid var(--system-cyan);
-            color: var(--system-cyan);
-            padding: 5px 10px;
-            cursor: pointer;
-            font-weight: bold;
+        .combat-panel {
+            width: 100%; max-width: 600px; background: #040a12; border: 2px solid var(--system-red);
+            box-shadow: var(--glow-red); margin-top: 10px; padding: 15px; border-radius: 4px;
+            display: flex; flex-direction: column; height: 90vh;
         }
-        .btn-action:hover {
-            background: rgba(0, 243, 255, 0.1);
+        .combat-header { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--system-red); padding-bottom: 10px; margin-bottom: 10px; }
+        .enemy-name { color: var(--system-red); font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 5px var(--system-red); }
+        .floor-indicator { color: var(--system-gold); font-weight: bold; }
+        
+        .combat-log {
+            flex-grow: 1; background: #000; border: 1px solid rgba(255, 31, 31, 0.3);
+            padding: 10px; overflow-y: auto; font-size: 0.8rem; line-height: 1.4;
+            display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;
         }
+        .log-sys { color: var(--system-cyan); }
+        .log-player { color: #fff; }
+        .log-dmg { color: var(--system-gold); font-weight: bold; }
+        .log-enemy { color: var(--system-red); }
+        .log-crit { color: #ff00ff; font-weight: bold; font-style: italic;}
+        .log-heal { color: #00ff55; }
+        
+        .combat-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-combat { background: #080303; border: 1px solid var(--system-red); color: #fff; padding: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-combat:hover { background: var(--system-red); color: #000; }
+        .btn-combat:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Cuadrícula de Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 10px;
-        }
-        .stat-box {
-            background: rgba(0, 0, 0, 0.4);
-            border-left: 3px solid var(--system-cyan);
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-plus {
-            background: var(--system-cyan);
-            border: none; color: #000;
-            width: 18px; height: 18px;
-            border-radius: 50%; font-weight: bold;
-            cursor: pointer; display: flex;
-            justify-content: center; align-items: center;
-            font-size: 0.75rem; visibility: hidden;
-        }
-
-        /* INVENTARIO (Estilo RPG) */
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .inv-slot {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px dashed rgba(0, 243, 255, 0.3);
-            aspect-ratio: 1;
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.75rem;
-            cursor: pointer;
-            position: relative;
-            padding: 5px;
-            text-align: center;
-        }
-        .inv-slot:hover {
-            border-color: var(--system-cyan);
-            background: rgba(0, 243, 255, 0.05);
-        }
-        .slot-count {
-            position: absolute;
-            bottom: 3px; right: 5px;
-            color: var(--system-gold);
-            font-weight: bold;
-        }
-
-        /* TIENDA */
-        .shop-item {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,183,3,0.3);
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-buy {
-            background: transparent;
-            border: 1px solid var(--system-gold);
-            color: var(--system-gold);
-            padding: 5px 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-buy:hover { background: rgba(255,183,3,0.1); }
-
-        /* NOTIFICACIONES */
-        .sys-toast {
-            position: fixed;
-            top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            opacity: 0; background: rgba(6, 15, 30, 0.95);
-            border: 2px solid var(--system-cyan); color: var(--system-cyan);
-            padding: 12px 24px; font-weight: bold; z-index: 1000;
-            transition: all 0.4s ease; text-align: center; box-shadow: 0 0 15px rgba(0,243,255,0.4);
-        }
+        .sys-toast { position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-100px); opacity: 0; background: rgba(4, 10, 20, 0.98); border: 2px solid var(--system-cyan); color: var(--system-cyan); padding: 12px 20px; font-weight: bold; z-index: 10000; transition: all 0.3s ease; text-align: center; box-shadow: var(--glow); }
         .sys-toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .sys-toast.danger { border-color: var(--penalty-red); color: var(--penalty-red); box-shadow: 0 0 15px var(--penalty-red); }
-
-        /* Animación Glitch Básica */
-        @keyframes glitch-anim {
-            0% { transform: scale(1); }
-            98% { transform: scale(1); }
-            99% { transform: skewX(-2deg); }
-            100% { transform: scale(1); }
-        }
+        
+        /* Utilitarios */
+        .text-cyan { color: var(--system-cyan); }
+        .text-gold { color: var(--system-gold); }
+        .text-purple { color: #d8b4fe; }
     </style>
 </head>
 <body>
 
+    <div id="sys-toast" class="sys-toast"></div>
+
     <div class="overlay" id="start-overlay">
         <div class="alert-box">
             <div class="alert-title">[AVISO DEL SISTEMA]</div>
-            <p style="line-height: 1.5; font-size: 0.95rem;">Se ha detectado un programa de entrenamiento diario para el jugador. Si no se completa, se aplicará una penalización severa.</p>
+            <p style="color: #a4dce0; margin-bottom: 10px; font-size: 0.85rem;">Se ha detectado un programa de entrenamiento diario. Preparando integración sensorial...</p>
             <button class="btn-accept" onclick="initializeSystem()">ACCEDER AL SISTEMA</button>
         </div>
     </div>
 
-    <div id="sys-toast" class="sys-toast"></div>
-
-    <div class="system-window">
+    <!-- UI PRINCIPAL -->
+    <div class="system-window" id="main-ui">
         <div class="system-header">
-            <div class="system-title">SISTEMA DE MONITOREO DE ESTADO</div>
+            <div class="system-title">MONITOREO DE ESTADO</div>
             <div class="player-meta">
-                <div>JUGADOR: <span style="color:#fff;">JOSÉ</span></div>
-                <div>RANGO: <span id="player-rank" style="color:var(--system-gold); font-weight:bold;">RANGO E</span></div>
-                <div>NIVEL: <span id="player-level" style="color:var(--system-cyan); font-weight:bold;">1</span></div>
-                <div>ORO: <span id="player-gold" style="color:var(--system-gold);">0G</span></div>
+                <div>RANGO: <span id="p-rank" class="text-gold">RANGO E</span></div>
+                <div>NIVEL: <span id="p-level" class="text-cyan">1</span></div>
+                <div>ORO: <span id="p-gold" class="text-gold">0G</span></div>
+                <div>PUNTOS: <span id="p-points" style="color:#00ff55;">0</span></div>
             </div>
-            <div style="margin-top: 10px; font-size: 0.85rem;">
-                FATIGA: <span id="fatigue-text">0</span>/100
-                <div class="status-bar-container">
-                    <div class="status-bar bg-fatigue" id="bar-fatigue"></div>
+            <div class="bar-group">
+                <div>
+                    <div class="bar-label"><span>HP</span><span id="txt-hp">100/100</span></div>
+                    <div class="status-bar-container"><div class="status-bar bg-hp" id="bar-hp"></div></div>
                 </div>
+                <div>
+                    <div class="bar-label"><span>MP</span><span id="txt-mp">100/100</span></div>
+                    <div class="status-bar-container"><div class="status-bar bg-mp" id="bar-mp"></div></div>
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <div class="bar-label"><span>FATIGA (Real)</span><span id="txt-fatigue">0/100</span></div>
+                <div class="status-bar-container"><div class="status-bar bg-fatigue" id="bar-fatigue"></div></div>
             </div>
         </div>
 
         <div class="system-tabs">
-            <button class="tab-btn active" onclick="switchTab('tab-misiones')">MISIONES</button>
-            <button class="tab-btn" onclick="switchTab('tab-stats')">ESTADÍSTICAS</button>
-            <button class="tab-btn" onclick="switchTab('tab-inventario')">INVENTARIO</button>
-            <button class="tab-btn" onclick="switchTab('tab-tienda')">TIENDA</button>
+            <button class="tab-btn active" id="btn-tab-misiones" onclick="switchTab('tab-misiones')">MISIONES Y DUNGEON</button>
+            <button class="tab-btn" id="btn-tab-stats" onclick="switchTab('tab-stats')">ATRIBUTOS</button>
+            <button class="tab-btn" id="btn-tab-inventario" onclick="switchTab('tab-inventario')">INVENTARIO</button>
         </div>
 
+        <!-- MISIONES -->
         <div id="tab-misiones" class="tab-content active">
-            <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--system-gold);">MISIÓN DIARIA: PREPARACIÓN PARA VOLVERSE FUERTE</div>
-            
-            <div class="quest-item">
-                <div>
-                    <div>Flexiones de Pecho</div>
-                    <div style="font-size:0.8rem; color:#888;"><span id="q-pushups">0</span> / 100 Reps</div>
-                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-pushups"></div></div>
-                </div>
-                <button class="btn-action" onclick="doExercise('pushups', 10)">+10</button>
-            </div>
-
-            <div class="quest-item">
-                <div>
-                    <div>Abdominales</div>
-                    <div style="font-size:0.8rem; color:#888;"><span id="q-situps">0</span> / 100 Reps</div>
-                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-situps"></div></div>
-                </div>
-                <button class="btn-action" onclick="doExercise('situps', 10)">+10</button>
-            </div>
-
-            <div class="quest-item">
-                <div>
-                    <div>Sentadillas</div>
-                    <div style="font-size:0.8rem; color:#888;"><span id="q-squats">0</span> / 100 Reps</div>
-                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-squats"></div></div>
-                </div>
-                <button class="btn-action" onclick="doExercise('squats', 10)">+10</button>
-            </div>
-
-            <div class="quest-item">
-                <div>
-                    <div>Carrera / Trote</div>
-                    <div style="font-size:0.8rem; color:#888;"><span id="q-running">0</span> / 10 Km</div>
-                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-running"></div></div>
-                </div>
-                <button class="btn-action" onclick="doExercise('running', 1)">+1 Km</button>
+            <div class="quest-box">
+                <div style="color: var(--system-gold); font-weight: bold; margin-bottom: 5px;">[MISIÓN DIARIA: PREPARACIÓN]</div>
+                <div class="quest-item"><span>Push-ups (<span id="mq-pushups">0</span>/100)</span><button class="btn-action" onclick="train('pushups', 10)">+10</button></div>
+                <div class="quest-item"><span>Sit-ups (<span id="mq-situps">0</span>/100)</span><button class="btn-action" onclick="train('situps', 10)">+10</button></div>
+                <div class="quest-item"><span>Squats (<span id="mq-squats">0</span>/100)</span><button class="btn-action" onclick="train('squats', 10)">+10</button></div>
+                <div class="quest-item"><span>Running (<span id="mq-running">0</span>/10Km)</span><button class="btn-action" onclick="train('running', 1)">+1Km</button></div>
             </div>
             
-            <button class="btn-action" style="width:100%; margin-top: 10px; border-color: #ffaa00; color: #ffaa00;" onclick="simulateNewDay()">Siguiente Día (Reset Diario)</button>
+            <div class="quest-box" style="border-color: var(--system-purple);">
+                <div style="color: #d8b4fe; font-weight: bold; margin-bottom: 5px;">[MAZMORRA INSTANTÁNEA]</div>
+                <p style="font-size: 0.75rem; color:#aaa; margin-bottom: 10px;">Usa tu cuerpo virtual y tus estadísticas ganadas para limpiar la mazmorra. Requiere 1 Llave.</p>
+                <button class="btn-action" style="width:100%; border-color:#d8b4fe; color:#d8b4fe; padding:10px;" onclick="enterDungeon()">ENTRAR A LA PUERTA (INICIAR COMBATE RPG)</button>
+            </div>
+            <button class="btn-action" style="width:100%;" onclick="nextDayCycle()">FINALIZAR DÍA (Reset)</button>
         </div>
 
+        <!-- ESTADÍSTICAS -->
         <div id="tab-stats" class="tab-content">
-            <div id="avail-points" style="color: var(--system-gold); font-size: 0.9rem; margin-bottom: 10px; display:none;">
-                PUNTOS DISPONIBLES: <span id="stat-points-val">0</span>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-box"><span>FUERZA (STR)</span><div><span id="st-str" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-str" onclick="addStat('str')">+</button></div></div>
-                <div class="stat-box"><span>AGILIDAD (AGI)</span><div><span id="st-agi" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-agi" onclick="addStat('agi')">+</button></div></div>
-                <div class="stat-box"><span>VITALIDAD (VIT)</span><div><span id="st-vit" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-vit" onclick="addStat('vit')">+</button></div></div>
-                <div class="stat-box"><span>INTELIGENCIA (INT)</span><div><span id="st-int" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-int" onclick="addStat('int')">+</button></div></div>
-            </div>
-            <button class="btn-action" style="width:100%; margin-top:15px;" onclick="restFatigue()">Descansar (Baja 25 de Fatiga)</button>
+            <p style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">*Tus estadísticas definen tu poder en el combate RPG.</p>
+            <div class="stat-card"><span>FUERZA (STR): Daño físico.</span><div><span id="st-str" class="text-cyan">10</span><button class="btn-plus" id="b-str" onclick="allocate('str')">+</button></div></div>
+            <div class="stat-card"><span>AGILIDAD (AGI): Evasión y Críticos.</span><div><span id="st-agi" class="text-cyan">10</span><button class="btn-plus" id="b-agi" onclick="allocate('agi')">+</button></div></div>
+            <div class="stat-card"><span>VITALIDAD (VIT): HP Máximo y Defensa.</span><div><span id="st-vit" class="text-cyan">10</span><button class="btn-plus" id="b-vit" onclick="allocate('vit')">+</button></div></div>
+            <div class="stat-card"><span>INTELIGENCIA (INT): MP y Daño Mágico.</span><div><span id="st-int" class="text-cyan">10</span><button class="btn-plus" id="b-int" onclick="allocate('int')">+</button></div></div>
+            <div class="stat-card" style="border-color:var(--system-purple);"><span>PERCEPCIÓN (PERC): Iniciativa y Puntería.</span><div><span id="st-perc" class="text-purple">10</span><button class="btn-plus" id="b-perc" onclick="allocate('perc')">+</button></div></div>
+            <button class="btn-action" style="width:100%; margin-top:10px;" onclick="restBody()">DESCANSAR (Cura HP/MP, -30 Fatiga)</button>
         </div>
 
+        <!-- INVENTARIO -->
         <div id="tab-inventario" class="tab-content">
-            <div style="font-size: 0.9rem; color: #88c8cc; margin-bottom: 10px;">Toca un ítem para consumirlo:</div>
-            <div class="inventory-grid">
-                <div class="inv-slot" onclick="useItem('potion_vit')">🧪<br><span style="font-size:0.65rem;">Poc. Vida</span><span class="slot-count" id="inv-count-potion_vit">0</span></div>
-                <div class="inv-slot" onclick="useItem('potion_str')">⚡<br><span style="font-size:0.65rem;">Proteína</span><span class="slot-count" id="inv-count-potion_str">0</span></div>
-                <div class="inv-slot">📦<br><span style="font-size:0.65rem; color:#555;">Vacío</span></div>
-                <div class="inv-slot">📦<br><span style="font-size:0.65rem; color:#555;">Vacío</span></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="quest-box">
+                    <div style="color:var(--system-cyan); font-weight:bold; margin-bottom:5px;">INVENTARIO</div>
+                    <div class="quest-item"><span>Poción HP x<span id="qty-pot_hp">0</span></span><button class="btn-action" onclick="consumeItem('pot_hp')">Usar</button></div>
+                    <div class="quest-item"><span>Poción MP x<span id="qty-pot_mp">0</span></span><button class="btn-action" onclick="consumeItem('pot_mp')">Usar</button></div>
+                    <div class="quest-item"><span>Llave Maz. x<span id="qty-key_dg">1</span></span></div>
+                </div>
+                <div class="quest-box">
+                    <div style="color:var(--system-gold); font-weight:bold; margin-bottom:5px;">TIENDA RÁPIDA</div>
+                    <div class="quest-item" style="font-size:0.75rem;">Poc. HP (40G) <button class="btn-action" onclick="buyItem('pot_hp', 40)">Comprar</button></div>
+                    <div class="quest-item" style="font-size:0.75rem;">Llave (100G) <button class="btn-action" onclick="buyItem('key_dg', 100)">Comprar</button></div>
+                    <div class="quest-item" style="font-size:0.75rem;">Colmillo Daga (+20 Dmg) (500G)<button class="btn-action" onclick="buyItem('dagger', 500)">Comprar</button></div>
+                </div>
+            </div>
+            <div class="quest-box" style="margin-top:10px;">
+                <div style="color:#d8b4fe; font-weight:bold; margin-bottom:5px;">HABILIDADES Y SOMBRAS</div>
+                <div class="quest-item" style="font-size:0.75rem;">[Sed de Sangre]: Baja Def enemiga (Coste: 20 MP)</div>
+                <div class="quest-item" style="font-size:0.75rem;">[Igris]: Ataca por ti (Coste: 30 MP). Requiere Comprarlo (800G) <button class="btn-action" onclick="buyItem('igris', 800)">Comprar</button></div>
             </div>
         </div>
+    </div>
 
-        <div id="tab-tienda" class="tab-content">
-            <div class="shop-item">
+    <!-- CONSOLA DE COMBATE RPG POR TEXTO -->
+    <div id="combat-overlay">
+        <div class="combat-panel">
+            <div class="combat-header">
                 <div>
-                    <div>Poción de Vitalidad</div>
-                    <div style="font-size:0.75rem; color:#aaa;">Cura 40 de Fatiga al instante</div>
+                    <div class="enemy-name" id="c-enemy-name">Lobo de Acero</div>
+                    <div style="font-size: 0.8rem;">HP: <span id="c-enemy-hp">150/150</span></div>
+                    <div class="status-bar-container" style="width: 150px; height: 6px; margin-top:2px; border-color:var(--system-red);"><div class="status-bar bg-hp" id="c-bar-enemy"></div></div>
                 </div>
-                <button class="btn-buy" onclick="buyItem('potion_vit', 50)">50 Gold</button>
+                <div style="text-align: right;">
+                    <div class="floor-indicator">SALA <span id="c-floor">1</span>/5</div>
+                    <div style="font-size: 0.8rem; color: #aaa;">JUGADOR HP: <span id="c-player-hp" class="text-cyan">100</span></div>
+                    <div style="font-size: 0.8rem; color: #aaa;">JUGADOR MP: <span id="c-player-mp" class="text-purple">100</span></div>
+                </div>
             </div>
-            <div class="shop-item">
-                <div>
-                    <div>Poción de Proteína</div>
-                    <div style="font-size:0.75rem; color:#aaa;">Te otorga +1 punto de Fuerza (STR)</div>
-                </div>
-                <button class="btn-buy" onclick="buyItem('potion_str', 120)">120 Gold</button>
+
+            <div class="combat-log" id="combat-log">
+                <div class="log-sys">[SISTEMA] Has entrado a la mazmorra.</div>
+            </div>
+
+            <div class="combat-controls">
+                <button class="btn-combat" id="cb-atk" onclick="rpgAction('ataque')">⚔️ ATACAR</button>
+                <button class="btn-combat" id="cb-skill" onclick="rpgAction('sed')">🩸 SED DE SANGRE (20 MP)</button>
+                <button class="btn-combat" id="cb-shadow" onclick="rpgAction('igris')" style="border-color:#d8b4fe; color:#d8b4fe;">🌑 INVOCAR IGRIS (30 MP)</button>
+                <button class="btn-combat" id="cb-flee" onclick="rpgAction('huir')">🏃 HUIR (Penalización)</button>
             </div>
         </div>
     </div>
 
     <script>
+        // CONFIGURACIÓN DE AUDIO NATIVA MÓVIL (Mismo fix)
         let audioCtx = null;
-        function playSystemSound(freq, type, duration) {
-            try {
-                if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = type || 'sine';
-                osc.frequency.value = freq || 440;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log("Audio no soportado o bloqueado"); }
-        }
+        function emitBeep(f, d) { try { if(!audioCtx) audioCtx = new(window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended')audioCtx.resume(); let o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(0.04,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+d); }catch(e){} }
 
-        // Estado Global del Jugador
-        let player = {
-            level: 1, rank: 'RANGO E', gold: 0, fatigue: 0, points: 0,
-            stats: { str: 10, agi: 10, vit: 10, int: 10 },
+        // ESTADO GLOBAL Y LORE
+        let state = {
+            level: 1, gold: 0, points: 0, exp: 0, hp: 100, mp: 100, fatigue: 0,
+            stats: { str: 10, agi: 10, vit: 10, int: 10, perc: 10 },
             progress: { pushups: 0, situps: 0, squats: 0, running: 0 },
-            inventory: { potion_vit: 0, potion_str: 0 },
+            inventory: { pot_hp: 0, pot_mp: 0, key_dg: 1, dagger: 0, igris: 0 },
             questDone: false
         };
+        const dailyGoals = { pushups: 100, situps: 100, squats: 100, running: 10 };
 
-        const goals = { pushups: 100, situps: 100, squats: 100, running: 10 };
+        // ESTADO COMBATE RPG
+        let rpg = { active: false, floor: 1, maxFloors: 5, eName: "", eHp: 0, eMaxHp: 0, eAtk: 0, eDef: 0, pDefMod: 0 };
+        const enemies = ["Duende Explorador", "Lobo Kasaka", "Araña de Cueva", "Orco de Rango D", "Hormiga Soldado"];
+        const bosses = ["Rey Duende Pielverde", "Serpiente Venenosa Gigante", "Lich de las Sombras"];
 
-        // Cargar datos guardados
-        if(localStorage.getItem('soloLevelingUltimate')) {
-            player = JSON.parse(localStorage.getItem('soloLevelingUltimate'));
-        }
-
-        function save() { localStorage.setItem('soloLevelingUltimate', JSON.stringify(player)); }
+        if(localStorage.getItem('soloLevelingRPG')){ try{ state = JSON.parse(localStorage.getItem('soloLevelingRPG')); }catch(e){} }
+        function saveGame() { localStorage.setItem('soloLevelingRPG', JSON.stringify(state)); }
 
         function initializeSystem() {
             document.getElementById('start-overlay').style.display = 'none';
-            playSystemSound(587.33, 'triangle', 0.4); // Sonido clásico de notificación "Ping"
-            setTimeout(() => playSystemSound(880, 'sine', 0.2), 150);
+            emitBeep(523.25, 0.15);
             updateUI();
         }
 
@@ -451,28 +270,9 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-            playSystemSound(400, 'sine', 0.05);
+            document.getElementById('btn-' + tabId).classList.add('active');
+            emitBeep(440, 0.05);
         }
 
-        function updateUI() {
-            // Rango según nivel
-            if(player.level >= 25) player.rank = 'RANGO S';
-            else if(player.level >= 18) player.rank = 'RANGO A';
-            else if(player.level >= 12) player.rank = 'RANGO B';
-            else if(player.level >= 7) player.rank = 'RANGO C';
-            else if(player.level >= 3) player.rank = 'RANGO D';
-            else player.rank = 'RANGO E';
-
-            document.getElementById('player-level').innerText = player.level;
-            document.getElementById('player-rank').innerText = player.rank;
-            document.getElementById('player-gold').innerText = player.gold + 'G';
-            document.getElementById('fatigue-text').innerText = player.fatigue;
-            document.getElementById('bar-fatigue').style.width = player.fatigue + '%';
-
-            // Stats
-            for(let s in player.stats) {
-                document.getElementById('st-' + s).innerText = player.stats[s];
-                document.getElementById('p-' + s).style.visibility = player.points > 0 ? 'visible' : 'hidden';
-            }
-            if(player.points > 0)
+        function triggerToast(txt) {
+            let t = document.getElementById('sys-toast'); t.innerText = txt; t.classNam
