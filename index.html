@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE ENTRENAMIENTO - SOLO LEVELING</title>
+    <style>
+        :root {
+            --bg-color: #050b14;
+            --panel-bg: rgba(10, 25, 47, 0.85);
+            --system-cyan: #00f3ff;
+            --system-blue: #0066ff;
+            --system-text: #e0f7fa;
+            --penalty-red: #ff3333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--system-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #0a192f 0%, #050b14 100%);
+        }
+
+        /* Contenedor Principal del Sistema */
+        .system-window {
+            width: 100%;
+            max-width: 650px;
+            background: var(--panel-bg);
+            border: 2px solid var(--system-cyan);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            padding: 25px;
+            position: relative;
+        }
+
+        /* Efecto de líneas de escaneo estilo holograma */
+        .system-window::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 243, 255, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Encabezado */
+        .system-header {
+            border-bottom: 2px dashed var(--system-cyan);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .system-title {
+            font-size: 1.8rem;
+            letter-spacing: 4px;
+            color: var(--system-cyan);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+            font-weight: 800;
+        }
+
+        .player-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        /* Sección de Misiones */
+        .quest-section {
+            margin-bottom: 25px;
+        }
+
+        .quest-title {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            border-left: 4px solid var(--system-cyan);
+            padding-left: 10px;
+        }
+
+        .quest-item {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .quest-item:hover {
+            border-color: var(--system-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .quest-info {
+            flex-grow: 1;
+            margin-right: 15px;
+        }
+
+        .quest-name {
+            font-weight: bold;
+            font-size: 1.05rem;
+            margin-bottom: 5px;
+        }
+
+        /* Barra de Progreso */
+        .progress-container {
+            width: 100%;
+            background: #112240;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--system-blue), var(--system-cyan));
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 8px var(--system-cyan);
+        }
+
+        /* Botones de Control */
+        .btn-count {
+            background: transparent;
+            border: 1px solid var(--system-cyan);
+            color: var(--system-cyan);
+            padding: 6px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .btn-count:hover {
+            background: var(--system-cyan);
+            color: #000;
+            box-shadow: 0 0 10px var(--system-cyan);
+        }
+
+        /* Sección de Estadísticas (Stats) */
+        .stats-section {
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
+            padding-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid var(--system-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-value-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-plus {
+            background: var(--system-cyan);
+            border: none;
+            color: #000;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            visibility: hidden; /* Se activa si hay puntos disponibles */
+        }
+
+        .points-available {
+            color: #ffb703;
+            text-shadow: 0 0 5px #ffb703;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        /* Alertas de Penalización y Éxito */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50px);
+            opacity: 0;
+            padding: 15px 30px;
+            border-radius: 4px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            z-index: 10;
+            transition: all 0.5s ease;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+        }
+
+        .notification.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notif-success {
+            background: var(--panel-bg);
+            border: 2px solid var(--system-cyan);
+            color: var(--system-cyan);
+        }
+
+        .notif-danger {
+            background: #2a0808;
+            border: 2px solid var(--penalty-red);
+            color: var(--penalty-red);
+            text-shadow: 0 0 10px var(--penalty-red);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.9; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.9; }
+        }
+
+        /* Botón de Reset Diario simulation */
+        .dev-controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .btn-dev {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #aaa;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 3px;
+            flex-grow: 1;
+        }
+        .btn-dev:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="system-notification" class="notification"></div>
+
+    <div class="system-window">
+        <div class="system-header">
+            <div class="system-title">MISIÓN DIARIA: PREPARARSE PARA VOLVERSE FUERTE</div>
+            <div class="player-status">
+                <div>JUGADOR: <span style="color: #fff;" id="player-name">JOSÉ</span></div>
+                <div>NIVEL: <span var(--system-cyan) style="color: var(--system-cyan); font-weight: bold;" id="player-level">1</span></div>
+            </div>
+        </div>
+
+        <div class="quest-section">
+            <div class="quest-title">
+                <span>OBJETIVOS DIARIOS</span>
+                <span id="quest-status-text" style="color: #ffb703; font-size: 0.9rem;">EN PROGRESO</span>
+            </div>
+
+            <div class="quest-item">
+                <div class="quest-info">
+                    <div class="quest-name">Flexiones de Pecho (Push-ups)</div>
+                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-pushups">0</span> / 100 Reps</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="bar-pushups"></div>
+                    </div>
+                </div>
+                <button class="btn-count" onclick="increment('pushups', 10)">+10</button>
+            </div>
+
+            <div class="quest-item">
+                <div class="quest-info">
+                    <div class="quest-name">Abdominales (Sit-ups)</div>
+                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-situps">0</span> / 100 Reps</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="bar-situps"></div>
+                    </div>
+                </div>
+                <button class="btn-count" onclick="increment('situps', 10)">+10</button>
+            </div>
+
+            <div class="quest-item">
+                <div class="quest-info">
+                    <div class="quest-name">Sentadillas (Squats)</div>
+                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-squats">0</span> / 100 Reps</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="bar-squats"></div>
+                    </div>
+                </div>
+                <button class="btn-count" onclick="increment('squats', 10)">+10</button>
+            </div>
+
+            <div class="quest-item">
+                <div class="quest-info">
+                    <div class="quest-name">Carrera / Trote (Running)</div>
+                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-running">0</span> / 10 Km</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="bar-running"></div>
+                    </div>
+                </div>
+                <button class="btn-count" onclick="increment('running', 1)">+1 Km</button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="quest-title">ESTADÍSTICAS DEL JUGADOR</div>
+            <div class="points-available" id="points-display" style="display: none;">
+                PUNTOS DE ESTADÍSTICA DISPONIBLES: <span id="stat-points">0</span>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span>FUERZA (STR)</span>
+                    <div class="stat-value-container">
+                        <span id="stat-str" style="color: var(--system-cyan);">10</span>
+                        <button class="btn-plus" id="btn-str" onclick="allocatePoint('str')">+</button>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <span>AGILIDAD (AGI)</span>
+                    <div class="stat-value-container">
+                        <span id="stat-agi" style="color: var(--system-cyan);">10</span>
+                        <button class="btn-plus" id="btn-agi" onclick="allocatePoint('agi')">+</button>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <span>VITALIDAD (VIT)</span>
+                    <div class="stat-value-container">
+                        <span id="stat-vit" style="color: var(--system-cyan);">10</span>
+                        <button class="btn-plus" id="btn-vit" onclick="allocatePoint('vit')">+</button>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <span>INTELIGENCIA (INT)</span>
+                    <div class="stat-value-container">
+                        <span id="stat-int" style="color: var(--system-cyan);">10</span>
+                        <button class="btn-plus" id="btn-int" onclick="allocatePoint('int')">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dev-controls">
+            <button class="btn-dev" onclick="resetDaily()">Siguiente Día (Reset)</button>
+            <button class="btn-dev" onclick="triggerPenalty()">Simular Zona de Penalización</button>
+        </div>
+    </div>
+
+    <script>
