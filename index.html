@@ -389,3 +389,150 @@
     </div>
 
     <script>
+        // Estado del Sistema (Guardado local automático)
+        let state = {
+            level: 1,
+            points: 0,
+            stats: { str: 10, agi: 10, vit: 10, int: 10 },
+            progress: { pushups: 0, situps: 0, squats: 0, running: 0 },
+            questCompleted: false
+        };
+
+        const targets = { pushups: 100, situps: 100, squats: 100, running: 10 };
+
+        // Cargar datos si existen
+        if (localStorage.getItem('soloLevelingWorkout')) {
+            state = JSON.parse(localStorage.getItem('soloLevelingWorkout'));
+        }
+
+        function saveState() {
+            localStorage.setItem('soloLevelingWorkout', JSON.stringify(state));
+        }
+
+        // Actualizar la Interfaz Gráfica
+        function updateUI() {
+            document.getElementById('player-level').innerText = state.level;
+            document.getElementById('stat-str').innerText = state.stats.str;
+            document.getElementById('stat-agi').innerText = state.stats.agi;
+            document.getElementById('stat-vit').innerText = state.stats.vit;
+            document.getElementById('stat-int').innerText = state.stats.int;
+
+            // Actualizar contadores y barras
+            for (let key in targets) {
+                document.getElementById(`count-${key}`).innerText = state.progress[key];
+                let percentage = (state.progress[key] / targets[key]) * 100;
+                if (percentage > 100) percentage = 100;
+                document.getElementById(`bar-${key}`).style.width = `${percentage}%`;
+            }
+
+            // Gestionar puntos asignables
+            if (state.points > 0) {
+                document.getElementById('points-display').style.display = 'block';
+                document.getElementById('stat-points').innerText = state.points;
+                document.querySelectorAll('.btn-plus').forEach(b => b.style.visibility = 'visible');
+            } else {
+                document.getElementById('points-display').style.display = 'none';
+                document.querySelectorAll('.btn-plus').forEach(b => b.style.visibility = 'hidden');
+            }
+
+            // Verificar si completó todo
+            checkQuestCompletion();
+        }
+
+        // Incrementar ejercicios
+        function increment(exercise, amount) {
+            if (state.progress[exercise] < targets[exercise]) {
+                state.progress[exercise] += amount;
+                if (state.progress[exercise] > targets[exercise]) {
+                    state.progress[exercise] = targets[exercise];
+                }
+                saveState();
+                updateUI();
+            }
+        }
+
+        // Asignar puntos ganados
+        function allocatePoint(stat) {
+            if (state.points > 0) {
+                state.stats[stat]++;
+                state.points--;
+                saveState();
+                updateUI();
+            }
+        }
+
+        // Validar si la misión diaria se completó
+        function checkQuestCompletion() {
+            let allDone = true;
+            for (let key in targets) {
+                if (state.progress[key] < targets[key]) {
+                    allDone = false;
+                }
+            }
+
+            const statusText = document.getElementById('quest-status-text');
+            if (allDone && !state.questCompleted) {
+                state.questCompleted = true;
+                state.level++;
+                state.points += 3; // 3 puntos de habilidad por subir de nivel
+                saveState();
+                showNotification('¡MISIÓN COMPLETADA! RECOMPENSAS ADQUIRIDAS: LEVEL UP + PUNTOS DE STAT.', 'success');
+                statusText.innerText = 'COMPLETADA';
+                statusText.style.color = 'var(--system-cyan)';
+            } else if (allDone) {
+                statusText.innerText = 'COMPLETADA';
+                statusText.style.color = 'var(--system-cyan)';
+            } else {
+                statusText.innerText = 'EN PROGRESO';
+                statusText.style.color = '#ffb703';
+            }
+        }
+
+        // Mostrar alertas flotantes estilo Sistema
+        function showNotification(text, type) {
+            const notif = document.getElementById('system-notification');
+            notif.innerText = text;
+            notif.className = 'notification'; // reset
+            
+            if (type === 'success') notif.classList.add('notif-success', 'active');
+            if (type === 'danger') notif.classList.add('notif-danger', 'active');
+
+            setTimeout(() => {
+                notif.classList.remove('active');
+            }, 5000);
+        }
+
+        // Simular Cambio de Día (Reset de ejercicios)
+        function resetDaily() {
+            // Si no completó la misión y decide forzar el cambio de día sin entrenar:
+            let allDone = true;
+            for (let key in targets) {
+                if (state.progress[key] < targets[key]) allDone = false;
+            }
+
+            if (!allDone && !state.questCompleted) {
+                triggerPenalty();
+                return;
+            }
+
+            state.progress = { pushups: 0, situps: 0, squats: 0, running: 0 };
+            state.questCompleted = false;
+            saveState();
+            updateUI();
+            showNotification('HA LLEGADO UNA NUEVA MISIÓN DIARIA.', 'success');
+        }
+
+        // Simular Zona de Penalización
+        function triggerPenalty() {
+            showNotification('ADVERTENCIA: NO SE COMPLETÓ LA MISIÓN DIARIA. SE HA ACTIVADO LA ZONA DE PENALIZACIÓN POR 4 HORAS.', 'danger');
+            state.progress = { pushups: 0, situps: 0, squats: 0, running: 0 };
+            state.questCompleted = false;
+            saveState();
+            updateUI();
+        }
+
+        // Inicializar
+        updateUI();
+    </script>
+</body>
+</html>
