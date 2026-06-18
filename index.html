@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE ENTRENAMIENTO - SOLO LEVELING</title>
+    <title>SISTEMA DE CAZADORES - SOLO LEVELING</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f3ff">
     <style>
         :root {
-            --bg-color: #050b14;
-            --panel-bg: rgba(10, 25, 47, 0.85);
+            --bg-color: #03070d;
+            --panel-bg: rgba(6, 15, 30, 0.9);
             --system-cyan: #00f3ff;
-            --system-blue: #0066ff;
-            --system-text: #e0f7fa;
-            --penalty-red: #ff3333;
+            --system-blue: #0055ff;
+            --system-gold: #ffb703;
+            --system-text: #d0f4f7;
+            --penalty-red: #ff2a2a;
+            --border-glow: 0 0 15px rgba(0, 243, 255, 0.3);
         }
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0;
+            font-family: 'Courier New', Courier, monospace, sans-serif;
         }
 
         body {
@@ -28,511 +31,448 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
+            background-image: radial-gradient(circle at center, #0b1a30 0%, #03070d 100%);
             overflow-x: hidden;
-            background-image: radial-gradient(circle at center, #0a192f 0%, #050b14 100%);
         }
 
-        /* Contenedor Principal del Sistema */
+        /* --- POPUP DE ADVERTENCIA INICIAL --- */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 7, 13, 0.95);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .alert-box {
+            background: rgba(15, 32, 67, 0.85);
+            border: 3px solid var(--system-cyan);
+            box-shadow: 0 0 30px var(--system-cyan);
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            border-radius: 4px;
+            animation: glitch-anim 2s infinite;
+        }
+        .alert-title {
+            color: var(--system-cyan);
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--system-cyan);
+        }
+        .btn-accept {
+            background: transparent;
+            border: 2px solid var(--system-cyan);
+            color: var(--system-cyan);
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px var(--system-cyan);
+        }
+        .btn-accept:hover {
+            background: var(--system-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--system-cyan);
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
         .system-window {
             width: 100%;
             max-width: 650px;
             background: var(--panel-bg);
             border: 2px solid var(--system-cyan);
             border-radius: 4px;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
-            padding: 25px;
+            box-shadow: var(--border-glow), inset 0 0 20px rgba(0, 243, 255, 0.15);
+            padding: 20px;
             position: relative;
         }
 
-        /* Efecto de líneas de escaneo estilo holograma */
-        .system-window::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 243, 255, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 2;
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-        }
-
-        /* Encabezado */
+        /* Cabecera */
         .system-header {
             border-bottom: 2px dashed var(--system-cyan);
             padding-bottom: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .system-title {
-            font-size: 1.8rem;
-            letter-spacing: 4px;
-            color: var(--system-cyan);
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
-            font-weight: 800;
-        }
-
-        .player-status {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-
-        /* Sección de Misiones */
-        .quest-section {
-            margin-bottom: 25px;
-        }
-
-        .quest-title {
-            color: #fff;
-            font-size: 1.2rem;
             margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            border-left: 4px solid var(--system-cyan);
-            padding-left: 10px;
+        }
+        .system-title {
+            font-size: 1.4rem;
+            text-align: center;
+            color: var(--system-cyan);
+            text-shadow: 0 0 8px var(--system-cyan);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .player-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 1rem;
         }
 
-        .quest-item {
-            background: rgba(0, 0, 0, 0.4);
+        /* Menú de Pestañas */
+        .system-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(0, 243, 255, 0.3);
-            padding: 15px;
+            color: #88c8cc;
+            padding: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .tab-btn.active {
+            background: rgba(0, 85, 255, 0.2);
+            border-color: var(--system-cyan);
+            color: var(--system-cyan);
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Contenido de Pestañas */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Barras de Estado (Fatiga, Oro) */
+        .status-bar-container {
+            background: #091324;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            height: 14px;
+            border-radius: 7px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .status-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .bg-fatigue { background: linear-gradient(90deg, #9400d3, #ff00ff); box-shadow: 0 0 5px #ff00ff; }
+        .bg-quest { background: linear-gradient(90deg, var(--system-blue), var(--system-cyan)); box-shadow: 0 0 5px var(--system-cyan); }
+
+        /* Lista de Objetivos */
+        .quest-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            padding: 12px;
             margin-bottom: 10px;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
         }
-
-        .quest-item:hover {
-            border-color: var(--system-cyan);
-            background: rgba(0, 243, 255, 0.05);
-        }
-
-        .quest-info {
-            flex-grow: 1;
-            margin-right: 15px;
-        }
-
-        .quest-name {
-            font-weight: bold;
-            font-size: 1.05rem;
-            margin-bottom: 5px;
-        }
-
-        /* Barra de Progreso */
-        .progress-container {
-            width: 100%;
-            background: #112240;
-            height: 10px;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 5px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--system-blue), var(--system-cyan));
-            width: 0%;
-            transition: width 0.4s ease;
-            box-shadow: 0 0 8px var(--system-cyan);
-        }
-
-        /* Botones de Control */
-        .btn-count {
+        .btn-action {
             background: transparent;
             border: 1px solid var(--system-cyan);
             color: var(--system-cyan);
-            padding: 6px 12px;
+            padding: 5px 10px;
             cursor: pointer;
             font-weight: bold;
-            border-radius: 3px;
-            transition: all 0.2s;
+        }
+        .btn-action:hover {
+            background: rgba(0, 243, 255, 0.1);
         }
 
-        .btn-count:hover {
-            background: var(--system-cyan);
-            color: #000;
-            box-shadow: 0 0 10px var(--system-cyan);
-        }
-
-        /* Sección de Estadísticas (Stats) */
-        .stats-section {
-            border-top: 1px solid rgba(0, 243, 255, 0.2);
-            padding-top: 20px;
-        }
-
+        /* Cuadrícula de Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 12px;
             margin-top: 10px;
         }
-
         .stat-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
-            border-radius: 4px;
-            border-left: 3px solid var(--system-blue);
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid var(--system-cyan);
+            padding: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .stat-value-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .btn-plus {
             background: var(--system-cyan);
-            border: none;
-            color: #000;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            font-weight: bold;
-            cursor: pointer;
+            border: none; color: #000;
+            width: 18px; height: 18px;
+            border-radius: 50%; font-weight: bold;
+            cursor: pointer; display: flex;
+            justify-content: center; align-items: center;
+            font-size: 0.75rem; visibility: hidden;
+        }
+
+        /* INVENTARIO (Estilo RPG) */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .inv-slot {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px dashed rgba(0, 243, 255, 0.3);
+            aspect-ratio: 1;
+            border-radius: 4px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 0.8rem;
-            visibility: hidden; /* Se activa si hay puntos disponibles */
-        }
-
-        .points-available {
-            color: #ffb703;
-            text-shadow: 0 0 5px #ffb703;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-
-        /* Alertas de Penalización y Éxito */
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-50px);
-            opacity: 0;
-            padding: 15px 30px;
-            border-radius: 4px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            z-index: 10;
-            transition: all 0.5s ease;
+            font-size: 0.75rem;
+            cursor: pointer;
+            position: relative;
+            padding: 5px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+        }
+        .inv-slot:hover {
+            border-color: var(--system-cyan);
+            background: rgba(0, 243, 255, 0.05);
+        }
+        .slot-count {
+            position: absolute;
+            bottom: 3px; right: 5px;
+            color: var(--system-gold);
+            font-weight: bold;
         }
 
-        .notification.active {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .notif-success {
-            background: var(--panel-bg);
-            border: 2px solid var(--system-cyan);
-            color: var(--system-cyan);
-        }
-
-        .notif-danger {
-            background: #2a0808;
-            border: 2px solid var(--penalty-red);
-            color: var(--penalty-red);
-            text-shadow: 0 0 10px var(--penalty-red);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.9; }
-            50% { opacity: 0.6; }
-            100% { opacity: 0.9; }
-        }
-
-        /* Botón de Reset Diario simulation */
-        .dev-controls {
-            margin-top: 25px;
+        /* TIENDA */
+        .shop-item {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,183,3,0.3);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
             display: flex;
             justify-content: space-between;
-            gap: 10px;
+            align-items: center;
         }
-
-        .btn-dev {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #aaa;
+        .btn-buy {
+            background: transparent;
+            border: 1px solid var(--system-gold);
+            color: var(--system-gold);
             padding: 5px 10px;
-            font-size: 0.8rem;
             cursor: pointer;
-            border-radius: 3px;
-            flex-grow: 1;
+            font-weight: bold;
         }
-        .btn-dev:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+        .btn-buy:hover { background: rgba(255,183,3,0.1); }
+
+        /* NOTIFICACIONES */
+        .sys-toast {
+            position: fixed;
+            top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            opacity: 0; background: rgba(6, 15, 30, 0.95);
+            border: 2px solid var(--system-cyan); color: var(--system-cyan);
+            padding: 12px 24px; font-weight: bold; z-index: 1000;
+            transition: all 0.4s ease; text-align: center; box-shadow: 0 0 15px rgba(0,243,255,0.4);
+        }
+        .sys-toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .sys-toast.danger { border-color: var(--penalty-red); color: var(--penalty-red); box-shadow: 0 0 15px var(--penalty-red); }
+
+        /* Animación Glitch Básica */
+        @keyframes glitch-anim {
+            0% { transform: scale(1); }
+            98% { transform: scale(1); }
+            99% { transform: skewX(-2deg); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <div id="system-notification" class="notification"></div>
+    <div class="overlay" id="start-overlay">
+        <div class="alert-box">
+            <div class="alert-title">[AVISO DEL SISTEMA]</div>
+            <p style="line-height: 1.5; font-size: 0.95rem;">Se ha detectado un programa de entrenamiento diario para el jugador. Si no se completa, se aplicará una penalización severa.</p>
+            <button class="btn-accept" onclick="initializeSystem()">ACCEDER AL SISTEMA</button>
+        </div>
+    </div>
+
+    <div id="sys-toast" class="sys-toast"></div>
 
     <div class="system-window">
         <div class="system-header">
-            <div class="system-title">MISIÓN DIARIA: PREPARARSE PARA VOLVERSE FUERTE</div>
-            <div class="player-status">
-                <div>JUGADOR: <span style="color: #fff;" id="player-name">JOSÉ</span></div>
-                <div>NIVEL: <span var(--system-cyan) style="color: var(--system-cyan); font-weight: bold;" id="player-level">1</span></div>
+            <div class="system-title">SISTEMA DE MONITOREO DE ESTADO</div>
+            <div class="player-meta">
+                <div>JUGADOR: <span style="color:#fff;">JOSÉ</span></div>
+                <div>RANGO: <span id="player-rank" style="color:var(--system-gold); font-weight:bold;">RANGO E</span></div>
+                <div>NIVEL: <span id="player-level" style="color:var(--system-cyan); font-weight:bold;">1</span></div>
+                <div>ORO: <span id="player-gold" style="color:var(--system-gold);">0G</span></div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.85rem;">
+                FATIGA: <span id="fatigue-text">0</span>/100
+                <div class="status-bar-container">
+                    <div class="status-bar bg-fatigue" id="bar-fatigue"></div>
+                </div>
             </div>
         </div>
 
-        <div class="quest-section">
-            <div class="quest-title">
-                <span>OBJETIVOS DIARIOS</span>
-                <span id="quest-status-text" style="color: #ffb703; font-size: 0.9rem;">EN PROGRESO</span>
-            </div>
-
-            <div class="quest-item">
-                <div class="quest-info">
-                    <div class="quest-name">Flexiones de Pecho (Push-ups)</div>
-                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-pushups">0</span> / 100 Reps</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-pushups"></div>
-                    </div>
-                </div>
-                <button class="btn-count" onclick="increment('pushups', 10)">+10</button>
-            </div>
-
-            <div class="quest-item">
-                <div class="quest-info">
-                    <div class="quest-name">Abdominales (Sit-ups)</div>
-                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-situps">0</span> / 100 Reps</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-situps"></div>
-                    </div>
-                </div>
-                <button class="btn-count" onclick="increment('situps', 10)">+10</button>
-            </div>
-
-            <div class="quest-item">
-                <div class="quest-info">
-                    <div class="quest-name">Sentadillas (Squats)</div>
-                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-squats">0</span> / 100 Reps</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-squats"></div>
-                    </div>
-                </div>
-                <button class="btn-count" onclick="increment('squats', 10)">+10</button>
-            </div>
-
-            <div class="quest-item">
-                <div class="quest-info">
-                    <div class="quest-name">Carrera / Trote (Running)</div>
-                    <div style="font-size: 0.85rem; color: #aaa;"><span id="count-running">0</span> / 10 Km</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-running"></div>
-                    </div>
-                </div>
-                <button class="btn-count" onclick="increment('running', 1)">+1 Km</button>
-            </div>
+        <div class="system-tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-misiones')">MISIONES</button>
+            <button class="tab-btn" onclick="switchTab('tab-stats')">ESTADÍSTICAS</button>
+            <button class="tab-btn" onclick="switchTab('tab-inventario')">INVENTARIO</button>
+            <button class="tab-btn" onclick="switchTab('tab-tienda')">TIENDA</button>
         </div>
 
-        <div class="stats-section">
-            <div class="quest-title">ESTADÍSTICAS DEL JUGADOR</div>
-            <div class="points-available" id="points-display" style="display: none;">
-                PUNTOS DE ESTADÍSTICA DISPONIBLES: <span id="stat-points">0</span>
+        <div id="tab-misiones" class="tab-content active">
+            <div style="margin-bottom: 12px; font-size: 0.9rem; color: var(--system-gold);">MISIÓN DIARIA: PREPARACIÓN PARA VOLVERSE FUERTE</div>
+            
+            <div class="quest-item">
+                <div>
+                    <div>Flexiones de Pecho</div>
+                    <div style="font-size:0.8rem; color:#888;"><span id="q-pushups">0</span> / 100 Reps</div>
+                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-pushups"></div></div>
+                </div>
+                <button class="btn-action" onclick="doExercise('pushups', 10)">+10</button>
+            </div>
+
+            <div class="quest-item">
+                <div>
+                    <div>Abdominales</div>
+                    <div style="font-size:0.8rem; color:#888;"><span id="q-situps">0</span> / 100 Reps</div>
+                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-situps"></div></div>
+                </div>
+                <button class="btn-action" onclick="doExercise('situps', 10)">+10</button>
+            </div>
+
+            <div class="quest-item">
+                <div>
+                    <div>Sentadillas</div>
+                    <div style="font-size:0.8rem; color:#888;"><span id="q-squats">0</span> / 100 Reps</div>
+                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-squats"></div></div>
+                </div>
+                <button class="btn-action" onclick="doExercise('squats', 10)">+10</button>
+            </div>
+
+            <div class="quest-item">
+                <div>
+                    <div>Carrera / Trote</div>
+                    <div style="font-size:0.8rem; color:#888;"><span id="q-running">0</span> / 10 Km</div>
+                    <div class="status-bar-container" style="width: 150px; height: 6px;"><div class="status-bar bg-quest" id="bar-q-running"></div></div>
+                </div>
+                <button class="btn-action" onclick="doExercise('running', 1)">+1 Km</button>
             </div>
             
+            <button class="btn-action" style="width:100%; margin-top: 10px; border-color: #ffaa00; color: #ffaa00;" onclick="simulateNewDay()">Siguiente Día (Reset Diario)</button>
+        </div>
+
+        <div id="tab-stats" class="tab-content">
+            <div id="avail-points" style="color: var(--system-gold); font-size: 0.9rem; margin-bottom: 10px; display:none;">
+                PUNTOS DISPONIBLES: <span id="stat-points-val">0</span>
+            </div>
             <div class="stats-grid">
-                <div class="stat-box">
-                    <span>FUERZA (STR)</span>
-                    <div class="stat-value-container">
-                        <span id="stat-str" style="color: var(--system-cyan);">10</span>
-                        <button class="btn-plus" id="btn-str" onclick="allocatePoint('str')">+</button>
-                    </div>
-                </div>
-                <div class="stat-box">
-                    <span>AGILIDAD (AGI)</span>
-                    <div class="stat-value-container">
-                        <span id="stat-agi" style="color: var(--system-cyan);">10</span>
-                        <button class="btn-plus" id="btn-agi" onclick="allocatePoint('agi')">+</button>
-                    </div>
-                </div>
-                <div class="stat-box">
-                    <span>VITALIDAD (VIT)</span>
-                    <div class="stat-value-container">
-                        <span id="stat-vit" style="color: var(--system-cyan);">10</span>
-                        <button class="btn-plus" id="btn-vit" onclick="allocatePoint('vit')">+</button>
-                    </div>
-                </div>
-                <div class="stat-box">
-                    <span>INTELIGENCIA (INT)</span>
-                    <div class="stat-value-container">
-                        <span id="stat-int" style="color: var(--system-cyan);">10</span>
-                        <button class="btn-plus" id="btn-int" onclick="allocatePoint('int')">+</button>
-                    </div>
-                </div>
+                <div class="stat-box"><span>FUERZA (STR)</span><div><span id="st-str" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-str" onclick="addStat('str')">+</button></div></div>
+                <div class="stat-box"><span>AGILIDAD (AGI)</span><div><span id="st-agi" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-agi" onclick="addStat('agi')">+</button></div></div>
+                <div class="stat-box"><span>VITALIDAD (VIT)</span><div><span id="st-vit" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-vit" onclick="addStat('vit')">+</button></div></div>
+                <div class="stat-box"><span>INTELIGENCIA (INT)</span><div><span id="st-int" style="color:var(--system-cyan)">10</span> <button class="btn-plus" id="p-int" onclick="addStat('int')">+</button></div></div>
+            </div>
+            <button class="btn-action" style="width:100%; margin-top:15px;" onclick="restFatigue()">Descansar (Baja 25 de Fatiga)</button>
+        </div>
+
+        <div id="tab-inventario" class="tab-content">
+            <div style="font-size: 0.9rem; color: #88c8cc; margin-bottom: 10px;">Toca un ítem para consumirlo:</div>
+            <div class="inventory-grid">
+                <div class="inv-slot" onclick="useItem('potion_vit')">🧪<br><span style="font-size:0.65rem;">Poc. Vida</span><span class="slot-count" id="inv-count-potion_vit">0</span></div>
+                <div class="inv-slot" onclick="useItem('potion_str')">⚡<br><span style="font-size:0.65rem;">Proteína</span><span class="slot-count" id="inv-count-potion_str">0</span></div>
+                <div class="inv-slot">📦<br><span style="font-size:0.65rem; color:#555;">Vacío</span></div>
+                <div class="inv-slot">📦<br><span style="font-size:0.65rem; color:#555;">Vacío</span></div>
             </div>
         </div>
 
-        <div class="dev-controls">
-            <button class="btn-dev" onclick="resetDaily()">Siguiente Día (Reset)</button>
-            <button class="btn-dev" onclick="triggerPenalty()">Simular Zona de Penalización</button>
+        <div id="tab-tienda" class="tab-content">
+            <div class="shop-item">
+                <div>
+                    <div>Poción de Vitalidad</div>
+                    <div style="font-size:0.75rem; color:#aaa;">Cura 40 de Fatiga al instante</div>
+                </div>
+                <button class="btn-buy" onclick="buyItem('potion_vit', 50)">50 Gold</button>
+            </div>
+            <div class="shop-item">
+                <div>
+                    <div>Poción de Proteína</div>
+                    <div style="font-size:0.75rem; color:#aaa;">Te otorga +1 punto de Fuerza (STR)</div>
+                </div>
+                <button class="btn-buy" onclick="buyItem('potion_str', 120)">120 Gold</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Estado del Sistema (Guardado local automático)
-        let state = {
-            level: 1,
-            points: 0,
+        let audioCtx = null;
+        function playSystemSound(freq, type, duration) {
+            try {
+                if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = type || 'sine';
+                osc.frequency.value = freq || 440;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Audio no soportado o bloqueado"); }
+        }
+
+        // Estado Global del Jugador
+        let player = {
+            level: 1, rank: 'RANGO E', gold: 0, fatigue: 0, points: 0,
             stats: { str: 10, agi: 10, vit: 10, int: 10 },
             progress: { pushups: 0, situps: 0, squats: 0, running: 0 },
-            questCompleted: false
+            inventory: { potion_vit: 0, potion_str: 0 },
+            questDone: false
         };
 
-        const targets = { pushups: 100, situps: 100, squats: 100, running: 10 };
+        const goals = { pushups: 100, situps: 100, squats: 100, running: 10 };
 
-        // Cargar datos si existen
-        if (localStorage.getItem('soloLevelingWorkout')) {
-            state = JSON.parse(localStorage.getItem('soloLevelingWorkout'));
+        // Cargar datos guardados
+        if(localStorage.getItem('soloLevelingUltimate')) {
+            player = JSON.parse(localStorage.getItem('soloLevelingUltimate'));
         }
 
-        function saveState() {
-            localStorage.setItem('soloLevelingWorkout', JSON.stringify(state));
+        function save() { localStorage.setItem('soloLevelingUltimate', JSON.stringify(player)); }
+
+        function initializeSystem() {
+            document.getElementById('start-overlay').style.display = 'none';
+            playSystemSound(587.33, 'triangle', 0.4); // Sonido clásico de notificación "Ping"
+            setTimeout(() => playSystemSound(880, 'sine', 0.2), 150);
+            updateUI();
         }
 
-        // Actualizar la Interfaz Gráfica
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            playSystemSound(400, 'sine', 0.05);
+        }
+
         function updateUI() {
-            document.getElementById('player-level').innerText = state.level;
-            document.getElementById('stat-str').innerText = state.stats.str;
-            document.getElementById('stat-agi').innerText = state.stats.agi;
-            document.getElementById('stat-vit').innerText = state.stats.vit;
-            document.getElementById('stat-int').innerText = state.stats.int;
+            // Rango según nivel
+            if(player.level >= 25) player.rank = 'RANGO S';
+            else if(player.level >= 18) player.rank = 'RANGO A';
+            else if(player.level >= 12) player.rank = 'RANGO B';
+            else if(player.level >= 7) player.rank = 'RANGO C';
+            else if(player.level >= 3) player.rank = 'RANGO D';
+            else player.rank = 'RANGO E';
 
-            // Actualizar contadores y barras
-            for (let key in targets) {
-                document.getElementById(`count-${key}`).innerText = state.progress[key];
-                let percentage = (state.progress[key] / targets[key]) * 100;
-                if (percentage > 100) percentage = 100;
-                document.getElementById(`bar-${key}`).style.width = `${percentage}%`;
+            document.getElementById('player-level').innerText = player.level;
+            document.getElementById('player-rank').innerText = player.rank;
+            document.getElementById('player-gold').innerText = player.gold + 'G';
+            document.getElementById('fatigue-text').innerText = player.fatigue;
+            document.getElementById('bar-fatigue').style.width = player.fatigue + '%';
+
+            // Stats
+            for(let s in player.stats) {
+                document.getElementById('st-' + s).innerText = player.stats[s];
+                document.getElementById('p-' + s).style.visibility = player.points > 0 ? 'visible' : 'hidden';
             }
-
-            // Gestionar puntos asignables
-            if (state.points > 0) {
-                document.getElementById('points-display').style.display = 'block';
-                document.getElementById('stat-points').innerText = state.points;
-                document.querySelectorAll('.btn-plus').forEach(b => b.style.visibility = 'visible');
-            } else {
-                document.getElementById('points-display').style.display = 'none';
-                document.querySelectorAll('.btn-plus').forEach(b => b.style.visibility = 'hidden');
-            }
-
-            // Verificar si completó todo
-            checkQuestCompletion();
-        }
-
-        // Incrementar ejercicios
-        function increment(exercise, amount) {
-            if (state.progress[exercise] < targets[exercise]) {
-                state.progress[exercise] += amount;
-                if (state.progress[exercise] > targets[exercise]) {
-                    state.progress[exercise] = targets[exercise];
-                }
-                saveState();
-                updateUI();
-            }
-        }
-
-        // Asignar puntos ganados
-        function allocatePoint(stat) {
-            if (state.points > 0) {
-                state.stats[stat]++;
-                state.points--;
-                saveState();
-                updateUI();
-            }
-        }
-
-        // Validar si la misión diaria se completó
-        function checkQuestCompletion() {
-            let allDone = true;
-            for (let key in targets) {
-                if (state.progress[key] < targets[key]) {
-                    allDone = false;
-                }
-            }
-
-            const statusText = document.getElementById('quest-status-text');
-            if (allDone && !state.questCompleted) {
-                state.questCompleted = true;
-                state.level++;
-                state.points += 3; // 3 puntos de habilidad por subir de nivel
-                saveState();
-                showNotification('¡MISIÓN COMPLETADA! RECOMPENSAS ADQUIRIDAS: LEVEL UP + PUNTOS DE STAT.', 'success');
-                statusText.innerText = 'COMPLETADA';
-                statusText.style.color = 'var(--system-cyan)';
-            } else if (allDone) {
-                statusText.innerText = 'COMPLETADA';
-                statusText.style.color = 'var(--system-cyan)';
-            } else {
-                statusText.innerText = 'EN PROGRESO';
-                statusText.style.color = '#ffb703';
-            }
-        }
-
-        // Mostrar alertas flotantes estilo Sistema
-        function showNotification(text, type) {
-            const notif = document.getElementById('system-notification');
-            notif.innerText = text;
-            notif.className = 'notification'; // reset
-            
-            if (type === 'success') notif.classList.add('notif-success', 'active');
-            if (type === 'danger') notif.classList.add('notif-danger', 'active');
-
-            setTimeout(() => {
-                notif.classList.remove('active');
-            }, 5000);
-        }
-
-        // Simular Cambio de Día (Reset de ejercicios)
-        function resetDaily() {
-            // Si no completó la misión y decide forzar el cambio de día sin entrenar:
-            let allDone = true;
-            for (let key in targets) {
-                if (state.progress[key] < targets[key]) allDone = false;
-            }
-
-            if (!allDone && !state.questCompleted) {
-                triggerPenalty();
-                return;
-            }
-
-            state.progress = { pushups: 0, situps: 0, squats: 0, running: 0 };
-            state.questCompleted = false;
-            saveState();
-            updateUI();
-            showNotification('HA LLEGADO UNA NUEVA MISIÓN DIARIA.', 'success');
-        }
-
-        // Simular Zona de Penalización
-        function triggerPenalty() {
-            showNotification('ADVERTENCIA: NO SE COMPLETÓ LA MISIÓN DIARIA. SE HA ACTIVADO LA ZONA DE PENALIZACIÓN POR 4 HORAS.', 'danger');
-            state.progress = { pushups: 0, situps: 0, squats: 0, running: 0 };
-            state.questCompleted = false;
-            saveState();
-            updateUI();
-        }
-
-        // Inicializar
-        updateUI();
-    </script>
-</body>
-</html>
+            if(player.points > 0)
